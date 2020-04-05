@@ -3,13 +3,12 @@ package pl.wtorkowy;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 
-    public static double[][] createMatrix(String path, int length, boolean isTest) {
+    public static double[][] createMatrix(String path, int length) {
         double[][] result = new double[length][9];
         String line;
         String[] separatedLine;
@@ -105,7 +104,7 @@ public class Main {
         }
     }
 
-    public static void writeClass(double[][] matrix) {
+    public static void writeClasses(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             System.out.print((i + 1) + ". ");
             if (0.0 == matrix[i][8]) {
@@ -117,33 +116,19 @@ public class Main {
             }
         }
     }
-
-    public static void main(String[] args) {
-        double[][] training;
-        double[][] test;
-
-        int k = 11;
-        String path = "2_4_k_11.txt";
-
-        training = createMatrix("data_train.csv", 105, false);
-        test = createMatrix("data_test.csv", 45, true);
-
-        for (double[] doubles : test) {
-            classification(training, doubles, k, 2, 4);
-        }
-
-        writeClass(test);
-
+    
+    public static void saveToFile(String path, double[][] matrix, int k) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(path))) {
             int tmp = 0;
             int bad = 0;
 
             dataOutputStream.writeChars("K: " + k + "\n");
 
-            for (int i = 1; i <= test.length; i++) {
-                dataOutputStream.writeChars(Arrays.toString(test[i - 1]) + "\n");
+            for (int i = 1; i <= matrix.length; i++) {
+                dataOutputStream.writeChars("Cechy: 1, 2, 3, 4");
+                dataOutputStream.writeChars(Arrays.toString(matrix[i - 1]) + "\n");
 
-                if (test[i - 1][4] == test[i - 1][8]) {
+                if (matrix[i - 1][4] == matrix[i - 1][8]) {
                     tmp++;
                 }
 
@@ -159,5 +144,28 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+        double[][] training;
+        double[][] test;
+
+        String path = "results\\fileName.txt";
+
+        // attributes
+        // 1 - sepal length, 2 - sepal width, 3 - petal length, 4 - petal width
+        int[] attributes = new int[] { 1, 2, 3, 4};
+        int k = 11;
+
+        training = createMatrix("data_train.csv", 105);
+        test = createMatrix("data_test.csv", 45);
+
+        for (double[] singleFlower : test) {
+            classification(training, singleFlower, k, attributes);
+        }
+
+        writeClasses(test);
+
+        saveToFile(path, test, k);
     }
 }
