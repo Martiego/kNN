@@ -1,4 +1,4 @@
-package pl.wtorkowy;
+package pl.inteligentna;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -7,6 +7,33 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
+
+    public static void main(String[] args) {
+        double[][] training;
+        double[][] test;
+
+        // File name
+        String path = "results\\1_2_k_11.txt";
+
+        String trainPath = "data_train.csv";
+        String testPath = "data_test.csv";
+
+        // attributes
+        // 1 - sepal length, 2 - sepal width, 3 - petal length, 4 - petal width
+        int[] attributes = new int[] { 1, 2 };
+        int k = 11;
+
+        training = createMatrix(trainPath, 105);
+        test = createMatrix(testPath, 45);
+
+        for (double[] singleFlower : test) {
+            classification(training, singleFlower, k, attributes);
+        }
+
+        writeClasses(test);
+
+        saveToFile(path, test, k);
+    }
 
     public static double[][] createMatrix(String path, int length) {
         double[][] result = new double[length][9];
@@ -37,7 +64,7 @@ public class Main {
         return result;
     }
 
-    public static void classification(double[][] training, double[] test, int k, int... attributes) {
+    public static void classification(double[][] training, double[] test, int k, int[] attributes) {
         Distance[] distance = new Distance[training.length];
 
         int setosa = 0;
@@ -107,16 +134,19 @@ public class Main {
     public static void writeClasses(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             System.out.print((i + 1) + ". ");
+
             if (0.0 == matrix[i][8]) {
                 System.out.println("Setosa");
             } else if (1.0 == matrix[i][8]) {
                 System.out.println("Versiocolor");
             } else if (2.0 == matrix[i][8]) {
                 System.out.println("Virginica");
+            } else {
+                System.out.println("No choice");
             }
         }
     }
-    
+
     public static void saveToFile(String path, double[][] matrix, int k) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(path))) {
             int tmp = 0;
@@ -125,7 +155,6 @@ public class Main {
             dataOutputStream.writeChars("K: " + k + "\n");
 
             for (int i = 1; i <= matrix.length; i++) {
-                dataOutputStream.writeChars("Cechy: 1, 2, 3, 4");
                 dataOutputStream.writeChars(Arrays.toString(matrix[i - 1]) + "\n");
 
                 if (matrix[i - 1][4] == matrix[i - 1][8]) {
@@ -144,28 +173,5 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-    }
-
-    public static void main(String[] args) {
-        double[][] training;
-        double[][] test;
-
-        String path = "results\\fileName.txt";
-
-        // attributes
-        // 1 - sepal length, 2 - sepal width, 3 - petal length, 4 - petal width
-        int[] attributes = new int[] { 1, 2, 3, 4};
-        int k = 11;
-
-        training = createMatrix("data_train.csv", 105);
-        test = createMatrix("data_test.csv", 45);
-
-        for (double[] singleFlower : test) {
-            classification(training, singleFlower, k, attributes);
-        }
-
-        writeClasses(test);
-
-        saveToFile(path, test, k);
     }
 }

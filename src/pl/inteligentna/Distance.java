@@ -1,4 +1,4 @@
-package pl.wtorkowy;
+package pl.inteligentna;
 
 public class Distance implements Comparable<Distance> {
     private int id;
